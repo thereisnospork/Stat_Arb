@@ -22,13 +22,13 @@ import matplotlib as plt
 #blah blah blah blah testing synch blah blah blah
 
 
-def get_time_open(SYM, directory='\\DJIA_2016\\', start=900, stop=1400):  ##date as sequential integer
+def get_time_open(SYM, directory='.//DJIA_2016//', start=900, stop=1400):  ##date as sequential integer
     """pulls time (native formate HHMM and open price for symbol. date is sequential integer input"""
-    folders = os.listdir(os.getcwd()+ directory)  # list of data dirs in selected dir
+    folders = os.listdir(directory)  # list of data dirs in selected dir
     folders.sort()  # sorted by date, old -> new
     list_by_date = list()
     for folder in folders:
-        symbol_data = np.genfromtxt(directory + folder + '\\table_' + SYM + '.csv', delimiter=',', usecols=(1, 2))
+        symbol_data = np.genfromtxt(directory + folder + '//table_' + SYM + '.csv', delimiter=',', usecols=(1, 2))
         early_mask = symbol_data[:, 0] > start  # start of day
         late_mask = symbol_data[:, 0] < stop  # end of day HHMM
         mask = early_mask * late_mask  # mask combination
@@ -95,15 +95,23 @@ def trade_algo1(up_then_down, symbol, buy_start = 5, money_init = 10000, buy_sto
   #  print(sum(profit) +' sum profit')
     return -1 * sum(profit)    #inverted output for benefit of minimize function (scipy)
 
-def trade_algo1_iter(up_then_down, symbol, buy_start = 5, n=20, money_init = 10000, buy_stop = 30, panic_stop = 30):
+def trade_algo1_iter(up_then_down, symbol, buy_start = 5, n=20, money_init = 10000, buy_stop = 30, panic_stop = 30, data_folder = '//DJIA_minute//'):
     """Averages x interations"""
     data = np.zeros(n)
-    symbol_data = get_time_open(symbol)
+    symbol_data = get_time_open(symbol,directory=data_folder)
     for i in range(n):
         datum = trade_algo1(up_then_down, symbol_data, buy_start, money_init, buy_stop, panic_stop)
         data[i] = datum
     result = np.mean(data)
     return result
+
+
+
+
+
+
+
+
 
 def opti_all(symbols, output_file):
     '''Optimizes all symbols based on trade_aldo_1_iter using scipy.differential evolution  Prints to CSV outputfile'''
