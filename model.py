@@ -164,23 +164,23 @@ def trade_algo2(up_then_down, symbol, buy_start = 5, money_init = 10000, buy_sto
 def trade_algo2_profit_only(up_then_down, symbol, buy_start = 5, money_init = 10000, buy_stop = 30, panic_stop = 30, iter = 20):
     """Iterates trade_algo 2 with same inputs plus iter.  Pulls the final money from the dataframe, discards the rest.  for optimization purposes"""
     money = list()
-    for n in iter:
+    for n in range(iter):
         full_data = trade_algo2(up_then_down, symbol, buy_start, money_init, buy_stop, panic_stop)
         money_only = full_data['money']
-        money.append(float(profits_only[-1:])) #pulls last profit from list of money
+        money.append(float(money_only[-1:])) #pulls last profit from list of money
     out = np.mean(money)
     out = -1 * out # inverse output for optimization
     return out
 
-def trade_algo2_profit_only(up_then_down, symbol, buy_start = 5, money_init = 10000, buy_stop = 30, panic_stop = 30, iter = 20):
+def trade_algo2_profit_only_short(up_then_down, symbol, buy_start = 5, money_init = 10000, buy_stop = 30, panic_stop = 30, iter = 20):
     """ Identical to trade algo 2 profit only except not inverted (for short optimization)"""
     money = list()
-    for n in iter:
+    for n in range(iter):
         full_data = trade_algo2(up_then_down, symbol, buy_start, money_init, buy_stop, panic_stop)
         money_only = full_data['money']
-        money.append(float(profits_only[-1:])) #pulls last profit from list of money
+        money.append(float(money_only[-1:])) #pulls last profit from list of money
     out = np.mean(money)
-    out = -1 * out # inverse output for optimization
+    #out = -1 * out # inverse output for optimization
     return out
 
 
