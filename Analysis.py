@@ -11,7 +11,7 @@ import pandas as pd
 timing_start = time.time()
 
 sym = md.get_time_open('gt',directory='.//DJIA_2016//')
-arguments = (sym,5,10000,30,30,20)  #trade_algo2 inputs after up_then down : symbol|buy_start|money_init|buy_stop|panic_stop
+arguments = (sym,5,10000,30,30,200)  #trade_algo2 inputs after up_then down : symbol|buy_start|money_init|buy_stop|panic_stop
 bnds = ((0,0.1),(0,0.1))
 res = differential_evolution(md.trade_algo2_profit_only, bnds, args=(arguments))
 print(res)
