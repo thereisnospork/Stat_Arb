@@ -1,5 +1,7 @@
 import model as md
 import time
+from scipy.optimize import differential_evolution
+
 from ggplot import *
 import pandas as pd
 #import numpy as np #imports as dependency from model
@@ -8,22 +10,12 @@ import pandas as pd
 
 timing_start = time.time()
 
-
-
-def opti_all(symbols, output_file):
-    '''Optimizes all symbols based on trade_aldo_1_iter using scipy.differential evolution  Prints to CSV outputfile'''
-    results = list()
-    for symbol in symbols:
-        res2 = differential_evolution(trade_algo2, args=(symbol,))
-        results.append(res2.x)
-        print(res2.x)
-        print(symbol)
-    np.genfromtxt(output_file,results)
-
-
-
-
-
+sym = md.get_time_open('gt',directory='.//DJIA_2016//')
+arguments = (sym,5,10000,30,30,20)  #trade_algo2 inputs after up_then down : symbol|buy_start|money_init|buy_stop|panic_stop
+bnds = ((0,0.1),(0,0.1))
+res = differential_evolution(md.trade_algo2_profit_only, bnds, args=(arguments))
+print(res)
+print(res.x)
 
 
 
