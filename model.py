@@ -133,6 +133,7 @@ def trade_algo2(up_then_down, symbol, buy_start = 5, money_init = 10000, buy_sto
         tick_count = 0
         exit_condition = -99
         sold = -99 # -99 error code
+        profit = -9999999 # error code
         ###START SELL Logic###
         for tick in row[buy_time + 1:-1]:    #### check slicing, starting from minute_tick after buy_time
             tick_count = tick_count +1
