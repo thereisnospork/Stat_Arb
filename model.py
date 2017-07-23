@@ -6,6 +6,7 @@
 
 import time
 import numpy as np
+import pandas as pd
 #import scipy as sp
 from scipy.optimize import minimize
 from scipy.optimize import differential_evolution
@@ -70,11 +71,13 @@ def trade_algo1(up_then_down, symbol, buy_start = 5, money_init = 10000, buy_sto
     down = up_then_down[1]  ###for array input into optimize function
     data_array = symbol
     profit = list()
+
     for row in data_array:  ###nditer to go row wise over data_array #### trivially parallel at this for loop
         buy_time = np.random.random_integers(buy_start, buy_stop)
         price = row[buy_time]
         shares = money_init//price
-        paid = shares * price   ###END BUY LOGIC ###
+        paid = shares * price
+        ###END BUY LOGIC ###
         ###START SELL Logic###
         for tick in row[buy_time + 1:-1]:    #### check slicing, starting from minute_tick after buy_time
             if tick > price + price * up:
@@ -106,6 +109,52 @@ def trade_algo1_iter(up_then_down, symbol, buy_start = 5, n=20, money_init = 100
     return result
 
 
+def trade_algo2(up_then_down, symbol, buy_start = 5, money_init = 10000, buy_stop = 30, panic_stop = 30):#, dates):
+    """
+        algorithm implementation.  inputs +/- bounds, symbol(s)  returns a list of profit of each trading day. up / down input as decimal percent
+        upthendown: 2 unit list
+        Returns list ['day','buy_time', shares', 'price_paid', 'sell_time', 'sell_price', 'profit', 'exit condition 0,1,2,3, = error|up|down|timeout',
+
+    """
+    #data_array = get_time_open(symbol)   ####generate data array within vs outside function
+    up = up_then_down[0]
+    down = up_then_down[1]  ###for array input into optimize function
+    data_array = symbol
+ #   profit = list()
+    output_labels = ('day','buy_time','shares','paid','sell_time','sold','profit','exit_condition')
+    output_array = np.zeros((len(data_array),8),dtype='Float64')
+    day = -1
+    for row in data_array:  ###nditer to go row wise over data_array #### trivially parallel at this for loop
+        buy_time = np.random.random_integers(buy_start, buy_stop)
+        price = row[buy_time]
+        shares = money_init//price
+        paid = shares * price   ###END BUY LOGIC ###
+        tick_count = 0
+        exit_condition = -99
+        sold = -99 # -99 error code
+        ###START SELL Logic###
+        for tick in row[buy_time + 1:-1]:    #### check slicing, starting from minute_tick after buy_time
+            tick_count = tick_count +1
+            if tick > price + price * up:
+                sold = tick * shares
+                profit = sold - paid
+                exit_condition = 0
+                break
+            if tick < price - price * down and tick != 0:
+                sold = tick * shares
+                profit = sold - paid  ##adds
+                exit_condition = 1
+                break
+            if tick == row[-panic_stop] and tick != 0:#-panic_stop]: ##did not meet exit condition, sell default 30 minutes before end of day.  Possible issues if panic stop exceeds number of trailing zeros in row
+                sold = tick * shares
+                profit = sold - paid
+                exit_condition = 2
+                break
+        day = day + 1
+        output_array[day] = (day,buy_time,shares,paid,tick_count,sold,profit,exit_condition)
+    output_df = pd.DataFrame(columns = output_labels, data = output_array)
+
+    return output_df
 
 
 
@@ -131,6 +180,16 @@ def print_results(list_of_results):
     for result in list_of_results:
         profit = trade_algo1_iter(result[0],result[1])
         print(str(profit)+ ' ' + result[1])
+
+
+
+
+
+
+
+
+
+
 
 
 # ^^^^^^^^^^^^^^^^^^^^DEBUG ME^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
