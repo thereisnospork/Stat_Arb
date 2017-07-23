@@ -8,11 +8,14 @@ import pandas as pd
 timing_start = time.time()
 #def trade_algo1_iter(up_then_down, symbol, buy_start = 5, n=20, money_init = 10000, buy_stop = 30, panic_stop = 30):
 
-asdf = md.trade_algo1_iter([0.07,.007],'gt',n=500,data_folder = './/DJIA_minute//')
+#asdf = md.trade_algo1_iter((0.07,.007),'gt',n=500,data_folder = './/DJIA_minute//')
+
+sym = md.get_time_open('aapl',directory='.//DJIA_minute//')
+asdf = md.trade_algo2((0.07,.007),sym)
+
 
 print(type(asdf))
 
 timing_end = time.time()
 timing = timing_end-timing_start
-print(timing)
-print(timing/500)
+print(str(timing)+ ' ' +'seconds')
