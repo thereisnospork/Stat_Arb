@@ -121,9 +121,10 @@ def trade_algo2(up_then_down, symbol, buy_start = 5, money_init = 10000, buy_sto
     down = up_then_down[1]  ###for array input into optimize function
     data_array = symbol
  #   profit = list()
-    output_labels = ('day','buy_time','shares','paid','sell_time','sold','profit','exit_condition')
-    output_array = np.zeros((len(data_array),8),dtype='Float64')
+    output_labels = ('day','buy_time','shares','paid','sell_time','sold','profit','exit_condition','money')
+    output_array = np.zeros((len(data_array),len(output_labels)),dtype='Float64')
     day = -1
+    money = money_init
     for row in data_array:  ###nditer to go row wise over data_array #### trivially parallel at this for loop
         buy_time = np.random.random_integers(buy_start, buy_stop)
         price = row[buy_time]
@@ -135,23 +136,26 @@ def trade_algo2(up_then_down, symbol, buy_start = 5, money_init = 10000, buy_sto
         ###START SELL Logic###
         for tick in row[buy_time + 1:-1]:    #### check slicing, starting from minute_tick after buy_time
             tick_count = tick_count +1
-            if tick > price + price * up:
+            if tick > price + price * up:   ### for each scenario, sell high, sell low, sell timout, create sold price, calculator profit, update money tracker, and set exit condition flag
                 sold = tick * shares
                 profit = sold - paid
+                money = money + profit
                 exit_condition = 0
                 break
             if tick < price - price * down and tick != 0:
                 sold = tick * shares
                 profit = sold - paid  ##adds
                 exit_condition = 1
+                money = money + profit
                 break
             if tick == row[-panic_stop] and tick != 0:#-panic_stop]: ##did not meet exit condition, sell default 30 minutes before end of day.  Possible issues if panic stop exceeds number of trailing zeros in row
                 sold = tick * shares
                 profit = sold - paid
                 exit_condition = 2
+                money = money + profit
                 break
         day = day + 1
-        output_array[day] = (day,buy_time,shares,paid,tick_count,sold,profit,exit_condition)
+        output_array[day] = (day,buy_time,shares,paid,tick_count,sold,profit,exit_condition,money)
     output_df = pd.DataFrame(columns = output_labels, data = output_array)
 
     return output_df
