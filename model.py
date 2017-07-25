@@ -178,11 +178,21 @@ def trade_algo2_profit_only_short(up_then_down, symbol, buy_start = 5, money_ini
     for n in range(iter):
         full_data = trade_algo2(up_then_down, symbol, buy_start, money_init, buy_stop, panic_stop)
         money_only = full_data['money']
-        money.append(float(money_only[-1:])) #pulls last profit from list of money
+        money.append(float(money_only[-1:])) #pulls last row from list of money in portfolio
     out = np.mean(money)
+    print(np.std(money))
     #out = -1 * out # inverse output for optimization
     return out
 
+def trade_algo2_full_iter(up_then_down, symbol, buy_start = 5, money_init = 10000, buy_stop = 30, panic_stop = 30, iter = 20):
+    """ Iteration of tradealgo2 (default 20x) returning full dataframe"""
+    output_labels = ('day','buy_time','shares','paid','sell_time','sold','profit','exit_condition','money')
+    data = pd.DataFrame(columns = output_labels)
+    for n in range(iter):
+        iter_data = trade_algo2(up_then_down, symbol, buy_start, money_init, buy_stop, panic_stop)
+        data = pd.concat([data,iter_data], ignore_index= False)
+        #print(data)
+    return data
 
 def opti_all(symbols, output_file):
     '''Optimizes all symbols based on trade_aldo_1_iter using scipy.differential evolution  Prints to CSV outputfile'''
