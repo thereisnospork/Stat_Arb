@@ -10,16 +10,26 @@ import pandas as pd
 
 timing_start = time.time()
 
-sym = md.get_time_open('gt',directory='.//DJIA_2016//')
-arguments = (sym,5,10000,30,30,200)  #trade_algo2 inputs after up_then down : symbol|buy_start|money_init|buy_stop|panic_stop
-bnds = ((0,0.1),(0,0.1))
-res = differential_evolution(md.trade_algo2_profit_only, bnds, args=(arguments))
+sym = md.get_time_open('ibm',directory='.//DJIA_2016//')
+arguments = (sym,5,10000,30,60,300)  #trade_algo2 inputs after up_then down : symbol|buy_start|money_init|buy_stop|panic_stop|iter
+bnds = ((0, 0.05),(0, 0.05))
+res = differential_evolution(md.trade_algo2_profit_only_short, bnds, args=(arguments))
 print(res)
 print(res.x)
+print(res.fun)
+print('gt_long')
 
+#to do:
+#get daily data to plot
+#calculate max draw down / Sharpe Ratio
 
+##EXecute single version of optimized ##;s
 
-
+#arguments = (sym,5,10000,30,60,30)  #trade_algo2 inputs after up_then down : symbol|buy_start|money_init|buy_stop|panic_stop|iter
+# bnds = ((0, 0.05),(0, 0.05))
+# sym = md.get_time_open('gt',directory='.//DJIA_2016//')
+# res = md.trade_algo2_profit_only_short(([ 0.03333181,  0.04332638]),sym,5,10000,30,90,2000)
+# print(res)
 
 
 
